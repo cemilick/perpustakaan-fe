@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { Input } from "../components/Input";
 import api from "../utils/axios";
 import Swal from "sweetalert2";
+import { Select } from "../components/Select";
 
 interface IFields {
     label: string;
@@ -11,6 +12,7 @@ interface IFields {
     type: string;
     rules: any;
     disabled?: boolean;
+    options?: any;
 }
 
 interface IBaseFormLayout {
@@ -18,13 +20,16 @@ interface IBaseFormLayout {
     data?: any;
     path: string;
     title: string;
+    transformFields?: (name: string) => void;
+    customSubmitAction?: (values: any) => Promise<any>;
+    disableAllFields?: boolean;
 }
 
-export const BaseFormLayout: React.FC<IBaseFormLayout> = ({ fields, data, path, title }) => {
+export const BaseFormLayout: React.FC<IBaseFormLayout> = ({ fields, data, path, title, transformFields, customSubmitAction, disableAllFields }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const keys = fields.flatMap((field) => (
-        [field.name]
+        [transformFields?.(field.name) ?? field.name]
     ));
 
     let initialValues = keys.reduce((acc: any, key) => {
@@ -48,7 +53,10 @@ export const BaseFormLayout: React.FC<IBaseFormLayout> = ({ fields, data, path, 
     const onSubmit = async (values: any) => {
         try {
             setIsLoading(false);
-            if (data) {
+
+            if (customSubmitAction) {
+                await customSubmitAction(values);
+            } else if (data) {
                 await api.post(path + `/${data?.id}`, values);
             } else {
                 await api.post(path, values);
@@ -62,10 +70,10 @@ export const BaseFormLayout: React.FC<IBaseFormLayout> = ({ fields, data, path, 
             }).then(() => {
                 window.location.reload();
             });
-        } catch (error) {
+        } catch (error: any) {
             Swal.fire({
                 title: 'Failed!',
-                text: 'Submit Failed!',
+                text: error.response.data.message,
                 timer: 2000,
                 icon: 'error',
             });
@@ -91,21 +99,38 @@ export const BaseFormLayout: React.FC<IBaseFormLayout> = ({ fields, data, path, 
 
     const form = () => (
         <Form onSubmit={handleSubmit(onSubmit, onError)}>
-            {fields.map((field) => (
-                <Input
-                    key={field.name}
-                    label={field.label}
-                    name={field.name}
-                    type={field.type}
-                    register={register}
-                    errors={errors}
-                    rules={field.rules}
-                    disabled={field.disabled}
-                />
-            ))}
-            <Button variant="primary" type="submit" className="mt-3">
-                {data ? 'Update' : 'Submit'}
-            </Button>
+            {fields.map((field) => {
+                if (field.type === "options") {
+                    return (<Select
+                        key={field.name}
+                        label={field.label}
+                        name={field.name}
+                        register={register}
+                        errors={errors}
+                        rules={field.rules}
+                        disabled={field.disabled || disableAllFields}
+                        options={field?.options ?? []}
+                    />)
+                }
+
+                return (
+                    <Input
+                        key={field.name}
+                        label={field.label}
+                        name={field.name}
+                        type={field.type}
+                        register={register}
+                        errors={errors}
+                        rules={field.rules}
+                        disabled={field.disabled || disableAllFields}
+                    />
+                );
+            })}
+            {!disableAllFields && (
+                <Button variant="primary" type="submit" className="mt-3">
+                    {data ? 'Update' : 'Submit'}
+                </Button>)
+            }
         </Form>
     );
 
