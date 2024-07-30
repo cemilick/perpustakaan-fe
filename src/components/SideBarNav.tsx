@@ -1,12 +1,11 @@
-import React, { Component } from "react"
-import { Card, CardTitle } from "react-bootstrap";
-import { FaBook, FaBookOpen, FaClipboardCheck, FaHandHolding, FaList, FaPlus, FaStore, FaUserPlus, FaUsers } from "react-icons/fa";
-import { FaHandsHoldingCircle, FaNoteSticky, FaPlaneUp } from "react-icons/fa6";
+import React from "react"
+import { FaBook, FaBookOpen, FaClipboardCheck, FaStore, FaUserPlus, FaUsers } from "react-icons/fa";
+import { FaHandsHoldingCircle, FaNoteSticky } from "react-icons/fa6";
 import { Menu, MenuItem, Sidebar, SubMenu } from "react-pro-sidebar"
-import { Link, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const SideBarNav: React.FC = () => {
-    const location = useLocation();
+    const navigate = useNavigate();
 
     return (<Sidebar style={{ minHeight: '100vh', top: 0, left: 0, position: 'absolute', minWidth: 300 }}>
         <Menu menuItemStyles={{
@@ -30,7 +29,7 @@ export const SideBarNav: React.FC = () => {
                 }
             },
         }}>
-            <div style={{ margin: 10 }}>
+            <div style={{ margin: 10 }} onClick={() => navigate('/')}>
                 <FaStore size={50} style={{ color: '#d359ff', marginRight: 10 }} />
                 <div style={{ fontSize: '1.5em', fontWeight: 'bolder', color: '#d359ff' }}>Perpustakaan</div>
             </div>

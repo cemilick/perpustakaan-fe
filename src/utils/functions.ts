@@ -28,3 +28,9 @@ export class DateHelper {
         return moment(date).format('DD MMMM YYYY');
     }
 }
+
+export class StringHelper {
+    public static formatCurrency(value: any) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value);
+    }
+}

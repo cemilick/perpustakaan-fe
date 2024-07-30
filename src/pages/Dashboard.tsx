@@ -2,5 +2,9 @@ import React from "react"
 
 export const Dashboard: React.FC = () => {
 
-    return (<><button className="btn btn-dark">K</button></>);
+    return (<div className="mt-5">
+        <h1>Welcome to</h1>
+        <br />
+        <h2>Perpustakaan Admin Applications</h2>
+    </div>);
 }

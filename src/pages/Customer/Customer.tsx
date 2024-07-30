@@ -21,7 +21,6 @@ export const Customer: React.FC = () => {
             return defaultCell;
         }}
         detailComponent={(data) => {
-            console.log('sa', data);
             return <CustomerForm data={data} />;
         }}
     />);
